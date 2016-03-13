@@ -1,18 +1,20 @@
 #include <stdint.h>
 #include <stdio.h>
- 
-uint8_t buttonStates = 0b00000101;
 
+#include "Arduino.h"
+
+uint8_t buttonPins[4] = {2, 3, 4, 5};
+ 
 uint8_t getButtonState(uint8_t index) {
-    return (buttonStates & (1 << index));
+    return digitalRead(buttonPins[index]);
 }
 
 void setButtonState(uint8_t index) {
-    buttonStates |= (1 << index);
+    digitalWrite(buttonPins[index], HIGH);
 }
 
 void clearButtonState(uint8_t index) {
-    buttonStates &= ~(1 << index);
+    digitalWrite(buttonPins[index], LOW);
 }
 
 void setup()
@@ -23,7 +25,6 @@ void setup()
 void loop()
 {
     // Game logic here
-    
     uint8_t i;
     for(i = 0; i < 4; ++i) {
         if(getButtonState(i)) {
@@ -32,13 +33,16 @@ void loop()
             setButtonState(i);
         }
         
-        printf("Button %d: %s\n", i, getButtonState(i) ? "Down" : "Up");
+        printf("%09d| Button %d: %s\n", millis(), i, getButtonState(i) ? "Down" : "Up");
+		delay(500);
     }
+	
 }
 
 // This simulates the arduino environment
 // Don't edit main as you won't
 int main() {
+	_initClock();
     setup();
     for(;;) {
         loop();
